@@ -148,6 +148,10 @@ End Select
 
 If (datearray(2).EQ.-1) then
   Read(timedate,'(I4.4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2)',iostat=ierr) datearray(1),tmp1,datearray(2),tmp2,datearray(3),tmp3,datearray(4),tmp4,datearray(5),tmp5,datearray(6)
+  if (ierr.ne.0) then
+    Read(timedate,'(I4.4,A1,I1.1,A1,I1.1)',iostat=ierr) datearray(1),tmp1,datearray(2),tmp2,datearray(3)
+    datearray(4:6)=0
+  end if
 Else  
   Read(timedate,'(I2.2,A5,I4.4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2)',iostat=ierr) datearray(3),tmp6,datearray(1),tmp3,datearray(4),tmp4,datearray(5),tmp5,datearray(6)  
 End If
@@ -262,17 +266,15 @@ End If
 ii=1
 ij=1
 Do li=1,arrsize(1,2)
+  ii(1)=li
   Do lj=1,arrsize(2,2)
+    ii(2)=lj  
     Do lk=1,arrsize(3,2)
+      ii(3)=lk    
       Do ll=1,arrsize(4,2)
-        ii(1)=li
-        ii(2)=lj
-        ii(3)=lk
         ii(4)=ll
       
-        Do i=1,maxdim
-          ij(i)=ii(duminx(i))
-        End Do
+        ij(1:maxdim)=ii(duminx(1:maxdim))
       
         arrdata(ii(1),ii(2),ii(3),ii(4))=dumarr(ij(1),ij(2),ij(3),ij(4))
       End Do
@@ -370,7 +372,7 @@ Return
 End
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! This subroutine returns the varid for lon, lat, lvl and tim
+! This subroutine returns the dimid for lon, lat, lvl and tim
 !
 
 Subroutine ncfinddimlen(ncid,valname,outname,valnum)
@@ -507,20 +509,20 @@ Character*80, dimension(1:maxlist,1:maxname) :: varnamelist
 Integer ncstatus,ierr,i,j
 
 varnamelist(:,:)=""
-varnamelist(1,1:3)=(/ 'u', 'U', 'zonal_wnd' /)
-varnamelist(2,1:3)=(/ 'v', 'V', 'merid_wnd' /)
-varnamelist(3,1:2)=(/ 'omega', 'W' /)
-varnamelist(4,1:3)=(/ 'temp', 'TA', 'air_temp' /)
-varnamelist(5,1:4)=(/ 'mixr', 'H', 'rh', 'mix_rto' /)
-varnamelist(6,1:3)=(/ 'zs', 'TOPO', 'topo' /)
-varnamelist(7,1:2)=(/ 'pblh', 'ZI' /)
-varnamelist(8,1:2)=(/ 'fg', 'HFLX' /)
-varnamelist(9,1:2)=(/ 'zolnd', 'ZRUF' /)
-varnamelist(10,1:2)=(/ 'alb', 'ALBEDO' /)
-varnamelist(11,1:2)=(/ 'pmsl', 'mslp' /)
-varnamelist(12,1:3)=(/ 'tss', 'sfc_temp', 'tsu' /)
-varnamelist(13,1:2)=(/ 'ps', 'sfc_pres' /)
-varnamelist(14,1:2)=(/ 'hgt', 'zht' /)
+varnamelist(1,1:3) =(/ 'u',     'U',        'zonal_wnd'          /)
+varnamelist(2,1:3) =(/ 'v',     'V',        'merid_wnd'          /)
+varnamelist(3,1:2) =(/ 'omega', 'W'                              /)
+varnamelist(4,1:3) =(/ 'temp',  'TA',       'air_temp'           /)
+varnamelist(5,1:4) =(/ 'mixr',  'H',        'rh',      'mix_rto' /)
+varnamelist(6,1:3) =(/ 'zs',    'TOPO',     'topo'               /)
+varnamelist(7,1:2) =(/ 'pblh',  'ZI'                             /)
+varnamelist(8,1:2) =(/ 'fg',    'HFLX'                           /)
+varnamelist(9,1:2) =(/ 'zolnd', 'ZRUF'                           /)
+varnamelist(10,1:2)=(/ 'alb',  'ALBEDO'                          /)
+varnamelist(11,1:2)=(/ 'pmsl', 'mslp'                            /)
+varnamelist(12,1:3)=(/ 'tss',  'sfc_temp', 'tsu'                 /)
+varnamelist(13,1:2)=(/ 'ps',   'sfc_pres'                        /)
+varnamelist(14,1:2)=(/ 'hgt',  'zht'                             /)
 
 outname=""
 
@@ -555,8 +557,8 @@ Else
   
       If (j.GT.maxname) Then
         outname=''
-	valident=-1
-	Return
+        valident=-1
+        Return
       End If
 
     End Do
@@ -1027,6 +1029,7 @@ Select Case(varname(1))
     If (outname.NE.varname(1)) Write(6,*) "Located "//trim(varname(1))//" as "//trim(outname)
     Call getncarray(ncid,outname,arrsize,arrdata)
     Call getncdata(ncid,outname,'units',inunit)
+    if (inunit.eq.'') inunit=varname(2) ! bug fix
 
 End Select
 
@@ -1101,6 +1104,173 @@ Do i=1,oldvarnum
     End If
   End If
 End Do
+
+Return
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! This subroutine reads topography data
+!
+
+Subroutine readtopography(topounit,toponame,ecodim,lonlat,schmidt,dsx,header)
+
+Implicit None
+
+include 'netcdf.inc'
+
+Integer, intent(in) :: topounit
+Integer, dimension(2), intent(out) :: ecodim
+Integer ierr,ncid,varid
+Character(len=*), intent(in) :: toponame
+Character*47, intent(out) :: header
+Real, dimension(1:2), intent(out) :: lonlat
+Real, intent(out) :: schmidt,dsx
+
+ierr=nf_open(toponame,nf_nowrite,ncid)
+if (ierr==0) then
+  ierr=nf_get_att_real(ncid,nf_global,'lon0',lonlat(1))
+  if (ierr/=0) then
+    write(6,*) "ERROR reading lon0"
+    stop
+  end if
+  ierr=nf_get_att_real(ncid,nf_global,'lat0',lonlat(2))
+  if (ierr/=0) then
+    write(6,*) "ERROR reading lat0"
+    stop
+  end if
+  ierr=nf_get_att_real(ncid,nf_global,'schmidt',schmidt)
+  if (ierr/=0) then
+    write(6,*) "ERROR reading schmidt"
+    stop
+  end if
+  ierr=nf_inq_dimid(ncid,'longitude',varid)
+  ierr=nf_inq_dimlen(ncid,varid,ecodim(1))
+  ierr=nf_inq_dimid(ncid,'latitude',varid)
+  ierr=nf_inq_dimlen(ncid,varid,ecodim(2))
+  ierr=nf_close(ncid)
+else
+  Open(topounit,FILE=toponame,FORM='formatted',STATUS='old',IOSTAT=ierr)
+  Read(topounit,*,IOSTAT=ierr) ecodim(1),ecodim(2),lonlat(1),lonlat(2),schmidt,dsx,header
+  Close(topounit)
+
+  If (ierr.NE.0) then
+    Write(6,*) "ERROR: Cannot read file ",trim(toponame)
+    Stop
+  End if
+end if
+
+Return
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! This subroutine reads the land/sea mask from topography data
+!
+
+Subroutine gettopols(topounit,toponame,lsmsk,ecodim)
+
+Implicit None
+
+include 'netcdf.inc'
+
+Integer, intent(in) :: topounit
+Integer, dimension(2), intent(in) :: ecodim
+integer, dimension(3) :: spos,npos
+Integer ierr,ilout,varid,ncid
+Character(len=*), intent(in) :: toponame
+Character*47 :: dc
+Character*9 formout
+Real, dimension(6) :: dr
+Real, dimension(ecodim(1),ecodim(2)), intent(out) :: lsmsk
+
+ierr=nf_open(toponame,nf_nowrite,ncid)
+if (ierr==0) then
+  spos=1
+  npos(1)=ecodim(1)
+  npos(2)=ecodim(2)
+  npos(3)=1
+  ierr=nf_inq_varid(ncid,'lsm',varid)
+  ierr=nf_get_vara_real(ncid,varid,spos,npos,lsmsk)
+  ierr=nf_close(ncid)
+else
+  ilout=Min(ecodim(1),30) ! To be compatiable with terread
+
+  Open(topounit,FILE=toponame,FORM='formatted',STATUS='old',IOSTAT=ierr)
+  Read(topounit,*,IOSTAT=ierr) dr(1:6),dc
+  Write(formout,'("(",i3,"f7.0)")',IOSTAT=ierr) ilout
+  Read(topounit,formout,IOSTAT=ierr) lsmsk ! Dummy topo data
+  Write(formout,'("(",i3,"f4.1)")',IOSTAT=ierr) ilout
+  Read(topounit,formout,IOSTAT=ierr) lsmsk ! Read ls mask
+  Close(topounit)
+end if
+
+If (ierr/=0) then
+  Write(6,*) "ERROR: Cannot read file ",trim(toponame)
+  Stop
+End if
+
+lsmsk=1.-lsmsk
+
+Return
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! This subroutine reads the land/sea mask from topography data
+!
+
+Subroutine gettopohgt(topounit,toponame,hgt,lsmsk,ecodim)
+
+Implicit None
+
+include 'netcdf.inc'
+
+Integer, intent(in) :: topounit
+Integer, dimension(2), intent(in) :: ecodim
+integer, dimension(3) :: spos,npos
+Integer ierr,ilout,varid,ncid
+Character(len=*), intent(in) :: toponame
+Character*47 :: dc
+Character*9 formout
+Real, dimension(6) :: dr
+Real, dimension(ecodim(1),ecodim(2)), intent(out) :: hgt,lsmsk
+
+ierr=nf_open(toponame,nf_nowrite,ncid)
+if (ierr==0) then
+  spos=1
+  npos(1)=ecodim(1)
+  npos(2)=ecodim(2)
+  npos(3)=1
+  ierr=nf_inq_varid(ncid,'zs',varid)
+  if (ierr/=0) then
+    write(6,*) "ERROR reading zs ",ierr
+    stop
+  end if
+  ierr=nf_get_vara_real(ncid,varid,spos,npos,hgt)
+  if (ierr/=0) then
+    write(6,*) "ERROR reading zs ",ierr
+    stop
+  end if
+  hgt=9.80616*hgt
+  ierr=nf_inq_varid(ncid,'lsm',varid)
+  ierr=nf_get_vara_real(ncid,varid,spos,npos,lsmsk)
+  ierr=nf_close(ncid)
+else
+  ilout=Min(ecodim(1),30) ! To be compatiable with terread
+
+  Open(topounit,FILE=toponame,FORM='formatted',STATUS='old',IOSTAT=ierr)
+  Read(topounit,*,IOSTAT=ierr) dr(1:6),dc
+  Write(formout,'("(",i3,"f7.0)")',IOSTAT=ierr) ilout
+  Read(topounit,formout,IOSTAT=ierr) hgt
+  Write(formout,'("(",i3,"f4.1)")',IOSTAT=ierr) ilout
+  Read(topounit,formout,IOSTAT=ierr) lsmsk ! Read ls mask
+  Close(topounit)
+end if
+
+If (ierr/=0) then
+  Write(6,*) "ERROR: Cannot read file ",trim(toponame)
+  Stop
+End if
+
+lsmsk=1.-lsmsk
 
 Return
 End
