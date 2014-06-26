@@ -12,7 +12,7 @@ Implicit None
 Integer :: nopts
 Character*256, dimension(:,:), allocatable :: options
 
-Write(6,*) 'll2hpac - Lat/Lon to MEDOC (HPAC) converter (MAY-06)'
+Write(6,*) 'll2hpac - Lat/Lon to MEDOC (HPAC) converter (DEC-12)'
 Write(6,*) 'Warning: this code has only been designed for SCIPUFF'
 
 ! Read switches
@@ -223,13 +223,18 @@ Do it=itmin,ncsize(4)
   Do ii=1,varnum(2,1)
     ! Get data from nc file
     Call getmeta(ncid,varname2d(ii,:),arrdata(:,:,1,1),arrsize)
-    ! Fix for negative Bowen ratio
-    If (varname2d(ii,1).EQ.'BOWEN') then
-      Write(6,*) "WARN: Changing all negative BOWEN ratios to zero."
-      Where (arrdata .LT. 0.)
-        arrdata=0.
-      End Where
-    End if
+    Select case(varname2d(ii,1))
+      Case ('BOWEN')
+        ! Fix for negative Bowen ratio
+        Write(6,*) "WARN: Changing all negative BOWEN ratios to zero."
+        arrdata=max(arrdata,0.)
+      Case ('ZRUF')
+        ! Fix for small roughness
+        Write(6,*) "WARN: Limiting small ZRUF values."
+        arrdata=max(arrdata,1.E-4)
+      Case Default
+        ! Do nothing
+    End select
 
     ! Write MEDOC (HPAC) data
     Call medocdata(outunit,arrdata(:,:,1,1),arrsize(1:3,2),mode)

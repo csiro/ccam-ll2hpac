@@ -96,13 +96,7 @@ Integer x,y,z
 9003 FORMAT(6(F12.4,1X))
 
 If (mode) Then
-  dummy=datain
-  Where (dummy .GT. 1.E5)
-    dummy=1.E5
-  End Where
-  Where (dummy .LT. -1.E5)
-    dummy=-1.E5
-  End Where
+  dummy=min(max(datain,-1.E5),1.E5)
   Write(outunit,9003) (((dummy(x,y,z),x=1,arrsize(1)),y=1,arrsize(2)),z=1,arrsize(3))
 Else
   Write(outunit) (((datain(x,y,z),x=1,arrsize(1)),y=1,arrsize(2)),z=1,arrsize(3))
