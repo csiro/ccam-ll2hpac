@@ -60,7 +60,8 @@ If (mode) Then
   Write(outunit,9002) 0,0,0,0,0,0
   Write(outunit,9002) 0,0,0
   Write(outunit,9003) (slvl(i),i=1,arrsize(3)),dx,dy,-999999.,-999999.,lonlat(2,1),outlon,0.,0.,0.,0.,slvl(arrsize(3))
-  Write(outunit,9001) (tempvarname3d(i,1),i=1,varnum(1,1)),(tempvarname3d(i,2),i=1,varnum(1,1)),(tempvarname2d(i,1),i=1,varnum(2,1)),(tempvarname2d(i,2),i=1,varnum(2,1))
+  Write(outunit,9001) (tempvarname3d(i,1),i=1,varnum(1,1)),(tempvarname3d(i,2),i=1,varnum(1,1)),(tempvarname2d(i,1),    &
+      i=1,varnum(2,1)),(tempvarname2d(i,2),i=1,varnum(2,1))
 Else
   Write(outunit) 'BBBBBBBB'
   Write(outunit) runname,.FALSE.,nestfile
@@ -70,7 +71,8 @@ Else
   Write(outunit) 0,0,0,0,0,0
   Write(outunit) 0,0,0
   Write(outunit) (slvl(i),i=1,arrsize(3)),dx,dy,-999999.,-999999.,lonlat(2,1),outlon,0.,0.,0.,0.,slvl(arrsize(3))
-  Write(outunit) (tempvarname3d(i,1),i=1,varnum(1,1)),(tempvarname3d(i,2),i=1,varnum(1,1)),(tempvarname2d(i,1),i=1,varnum(2,1)),(tempvarname2d(i,2),i=1,varnum(2,1))
+  Write(outunit) (tempvarname3d(i,1),i=1,varnum(1,1)),(tempvarname3d(i,2),i=1,varnum(1,1)),(tempvarname2d(i,1),         &
+      i=1,varnum(2,1)),(tempvarname2d(i,2),i=1,varnum(2,1))
 End If
 
 

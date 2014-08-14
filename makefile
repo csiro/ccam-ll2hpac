@@ -1,7 +1,7 @@
 CMP = ifort
-XFLAGS = -O -static-libcxa -xW
-INC = -I/home/tha051/lib 
-LIBS = -L/home/tha051/lib -lnetcdf_ifort
+XFLAGS = -O
+INC = -I $(NETCDF_ROOT)/include
+LIBS = -L $(NETCDF_ROOT)/lib -lnetcdf -lnetcdff
 
 OBJ = ll2hpac.o readswitch.o ncread.o writehpac.o misc.o
 
@@ -16,5 +16,3 @@ clean:
 
 .f90.o:
 	$(CMP) -c $(XFLAGS) $(INC) $<
-ncread.o: ncread.f90
-	$(CMP) -c $(XFLAGS) $(INC) -recursive ncread.f90

@@ -122,10 +122,36 @@ mode=.TRUE. ! T=Free, F=Binary HPAC format
 varnum(1,2)=7 ! max 3d
 varnum(2,2)=8 ! max 2d
 Allocate(varname3d(1:varnum(1,2),1:2),varname2d(1:varnum(2,2),1:2))
-varname3d(:,1)=(/ "U",   "V",   "W",   "TA", "H",   "UUE",     "VVE" /)
-varname3d(:,2)=(/ "m/s", "m/s", "m/s", "K",  "g/g", "(m/s)^2", "(m/s)^2" /)
-varname2d(:,1)=(/ "TOPO", "ZI", "HFLX",  "ZRUF", "ALBEDO", "BOWEN", "CANOPY", "ALPHA" /)
-varname2d(:,2)=(/ "m",    "m",  "W/m^2", "m",    "none",   "none",  "m",      "none" /)
+varname3d(1,1)="U"
+varname3d(2,1)="V"
+varname3d(3,1)="W"
+varname3d(4,1)="TA"
+varname3d(5,1)="H"
+varname3d(6,1)="UUE"
+varname3d(7,1)="VVE"
+varname3d(1,2)="m/s"
+varname3d(2,2)="m/s"
+varname3d(3,2)="m/s"
+varname3d(4,2)="K"
+varname3d(5,2)="g/g"
+varname3d(6,2)="(m/s)^2"
+varname3d(7,2)="(m/s)^2"
+varname2d(1,1)="TOPO"
+varname2d(2,1)="ZI"
+varname2d(3,1)="HFLX"
+varname2d(4,1)="ZRUF"
+varname2d(5,1)="ALBEDO"
+varname2d(6,1)="BOWEN"
+varname2d(7,1)="CANOPY"
+varname2d(8,1)="ALPHA"
+varname2d(1,2)="m"
+varname2d(2,2)="m"
+varname2d(3,2)="W/m^2"
+varname2d(4,2)="m"
+varname2d(5,2)="none"
+varname2d(6,2)="none"
+varname2d(7,2)="m"
+varname2d(8,2)="none"
 varnum(:,1)=varnum(:,2) ! actual 3d and 2d
 
 ! Read switches
