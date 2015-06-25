@@ -92,9 +92,9 @@ End
 
 Subroutine hpacconvert(options,nopts)
 
-Implicit None
+use netcdf_m
 
-Include "netcdf.inc"
+Implicit None
 
 Integer, intent(in) :: nopts
 Character(len=*), dimension(nopts,2), intent(in) :: options
