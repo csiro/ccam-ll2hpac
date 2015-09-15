@@ -10,7 +10,7 @@ ll2hpac : $(OBJ)
 	$(CMP) $(XFLAGS) $(OBJ) $(LIBS) -o ll2hpac
 
 clean:
-	rm -f *.o core
+	rm -f *.o core *.mod
 
 
 .SUFFIXES:.f90
