@@ -12,6 +12,11 @@ Implicit None
 Integer :: nopts
 Character*256, dimension(:,:), allocatable :: options
 
+! Start banner
+write(6,*) "=================================================================================="
+write(6,*) "CCAM: Starting ll2hpac"
+write(6,*) "=================================================================================="
+
 Write(6,*) 'll2hpac - Lat/Lon to MEDOC (HPAC) converter (DEC-12)'
 Write(6,*) 'Warning: this code has only been designed for SCIPUFF'
 
@@ -28,9 +33,25 @@ Call hpacconvert(options,nopts)
 
 Deallocate(options)
 
+! Complete
+write(6,*) "CCAM: ll2hpac completed successfully"
+call finishbanner
+
 Stop
 End
 
+subroutine finishbanner
+
+implicit none
+
+! End banner
+write(6,*) "=================================================================================="
+write(6,*) "CCAM: Finished ll2hpac"
+write(6,*) "=================================================================================="
+
+return
+end    
+    
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! This subroutine displays the help message
 !
@@ -49,6 +70,7 @@ Write(6,*) "  -o outputfile  Output filename (default = inputfile.fmt)"
 Write(6,*) "  -n nestfile    MEDOC file to be nested in the current file"
 Write(6,*) "                 (default = no nested file)"
 Write(6,*)
+call finishbanner
 Stop
 
 Return
@@ -74,6 +96,7 @@ nestfile=locate('-n',options(:,1),nopts)
 
 If (options(infile,2).EQ.'') then
   Write(6,*) "ERROR: No input filename specified"
+  call finishbanner
   Stop
 End if
 
@@ -169,6 +192,7 @@ End If
 ncstatus=nf_open(infile,nf_nowrite,ncid)
 If (ncstatus.NE.nf_noerr) Then
   Write(6,*) "ERROR: Error opening NetCDF file ",trim(infile)," (",ncstatus,")"
+  call finishbanner
   Stop
 End If
 

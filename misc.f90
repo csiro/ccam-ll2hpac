@@ -1,3 +1,24 @@
+! Conformal Cubic Atmospheric Model
+    
+! Copyright 2015 Commonwealth Scientific Industrial Research Organisation (CSIRO)
+    
+! This file is part of the Conformal Cubic Atmospheric Model (CCAM)
+!
+! CCAM is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! CCAM is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with CCAM.  If not, see <http://www.gnu.org/licenses/>.
+
+!------------------------------------------------------------------------------
+    
 !
 ! THIS FILE CONTAINS MISC SUBROUTINES
 !
@@ -176,6 +197,7 @@ Select Case(inunit)
   Case DEFAULT
     Write(6,*) "ERROR: Unknown unit ",trim(inunit)," for conversion."
     Write(6,*) "       Please contact MJT and get him to fix this."
+    call finishbanner
     Stop
   
 End Select
@@ -185,6 +207,7 @@ If (inverse.EQ.1) Then
 Else
   If ((baseunit.NE.actunit).AND.(actunit.NE.'none')) Then
     Write(6,*) "ERROR: Mismatched units ",trim(baseunit)," and ",trim(actunit)
+    call finishbanner
     Stop
   End If
 End If
@@ -330,6 +353,7 @@ Do While(outdate(3)>maxday)
   
     Case DEFAULT
       Write(6,*) "ERROR: Internal error in advdate"
+      call finishbanner
       Stop
   
   End Select
@@ -420,9 +444,11 @@ Real m
 
 If (posout<Minval(posin)) Then
   Write(6,*) "ERROR: Must extrapolate below lowest value"
+  call finishbanner
   Stop
 Else If (posout>Maxval(posin)) Then
   Write(6,*) "ERROR: Must extrapolate above highest value"
+  call finishbanner
   Stop
 end if
 
@@ -479,6 +505,7 @@ Read(instr,*,iostat=ierr) sr
 
 if (ierr/=0) then
   Write(6,*) "ERROR: String "//trim(instr)//" is not a number."
+  call finishbanner
   Stop
 end if
 
