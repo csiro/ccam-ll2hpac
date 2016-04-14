@@ -9,15 +9,18 @@ Program ll2hpac
 
 Implicit None
 
+include 'version.h'
+
 Integer :: nopts
 Character*256, dimension(:,:), allocatable :: options
 
 ! Start banner
-write(6,*) "=================================================================================="
+write(6,*) "==============================================================================="
 write(6,*) "CCAM: Starting ll2hpac"
-write(6,*) "=================================================================================="
+write(6,*) "==============================================================================="
 
-Write(6,*) 'll2hpac - Lat/Lon to MEDOC (HPAC) converter (DEC-12)'
+Write(6,*) 'll2hpac - Lat/Lon to MEDOC (HPAC) converter'
+write(6,*) version
 Write(6,*) 'Warning: this code has only been designed for SCIPUFF'
 
 ! Read switches
@@ -45,9 +48,9 @@ subroutine finishbanner
 implicit none
 
 ! End banner
-write(6,*) "=================================================================================="
+write(6,*) "==============================================================================="
 write(6,*) "CCAM: Finished ll2hpac"
-write(6,*) "=================================================================================="
+write(6,*) "==============================================================================="
 
 return
 end    

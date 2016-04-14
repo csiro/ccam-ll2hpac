@@ -15,8 +15,15 @@ clean:
 
 .SUFFIXES:.f90
 
+version.h: FORCE
+	rm -f brokenver tmpver
+	echo "      character(len=*), parameter :: version ='LL2HPAC r'" > brokenver
+	echo "      character(len=*), parameter :: version ='LL2HPAC r`svnversion .`'" > tmpver
+	grep exported tmpver || grep Unversioned tmpver || cmp tmpver brokenver || cmp tmpver version.h || mv tmpver version.h
+FORCE:
+
 .f90.o:
 	$(CMP) -c $(XFLAGS) $(INC) $<
 
-ll2hpac.o : netcdf_m.o
+ll2hpac.o : netcdf_m.o version.h
 ncread.o : netcdf_m.o
