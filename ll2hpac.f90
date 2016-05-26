@@ -100,7 +100,7 @@ nestfile=locate('-n',options(:,1),nopts)
 If (options(infile,2).EQ.'') then
   Write(6,*) "ERROR: No input filename specified"
   call finishbanner
-  Stop
+  Stop -1
 End if
 
 If (options(outfile,2).EQ.'') then
@@ -196,7 +196,7 @@ ncstatus=nf_open(infile,nf_nowrite,ncid)
 If (ncstatus.NE.nf_noerr) Then
   Write(6,*) "ERROR: Error opening NetCDF file ",trim(infile)," (",ncstatus,")"
   call finishbanner
-  Stop
+  Stop -1
 End If
 
 ! Get nc dimensions, date, time, lat, lon, etc
