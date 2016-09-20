@@ -15,7 +15,7 @@ Integer, intent(in) :: outunit
 Integer, dimension(1:2,1:2) :: varnum
 Character(len=*), dimension(1:varnum(1,2),1:2), intent(in) :: varname3d
 Character(len=*), dimension(1:varnum(2,2),1:2), intent(in) :: varname2d
-Character(len=256), intent(in) :: nestfile
+Character(len=*), intent(in) :: nestfile
 Character(len=8), dimension(1:varnum(1,2),1:2) :: tempvarname3d
 Character(len=8), dimension(1:varnum(2,2),1:2) :: tempvarname2d
 Character(len=8) runname

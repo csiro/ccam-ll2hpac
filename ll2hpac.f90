@@ -12,7 +12,7 @@ Implicit None
 include 'version.h'
 
 Integer :: nopts
-Character*256, dimension(:,:), allocatable :: options
+Character*1024, dimension(:,:), allocatable :: options
 
 ! Start banner
 write(6,*) "=============================================================================="
@@ -125,9 +125,8 @@ Implicit None
 Integer, intent(in) :: nopts
 Character(len=*), dimension(nopts,2), intent(in) :: options
 Character*80, dimension(:,:), allocatable :: varname3d,varname2d
-Character*80 :: infile,outfile,utype,returnoption
-Character*80 :: nctmunit,nctmdate,outname,inunit
-Character*256 :: nestfile
+Character*1024 :: infile,outfile,nestfile,returnoption
+Character*80 :: nctmunit,nctmdate,inunit
 Real, dimension(:,:,:,:), allocatable :: arrdata
 Real, dimension(:,:,:), allocatable :: inlvl
 Real, dimension(:), allocatable :: outlvl
