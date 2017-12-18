@@ -107,7 +107,7 @@ End
 ! This function returns an option value
 !
 
-Character*80 Function returnoption(flag,options,nopts)
+Character*1024 Function returnoption(flag,options,nopts)
 
 Implicit None
 
