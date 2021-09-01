@@ -671,7 +671,7 @@ Integer, intent(in) :: ncid
 Character(len=*), intent(in) :: valname
 Character(len=*), intent(out) :: outname
 Integer, intent(out) :: valident
-Integer, parameter :: maxname=5
+Integer, parameter :: maxname=6
 Character*80, dimension(1:4,1:maxname) :: varnamelist
 Integer ncstatus,ierr,i,j
 
@@ -686,6 +686,7 @@ varnamelist(3,2)="level"
 varnamelist(3,3)="pres"
 varnamelist(3,4)="lvl"
 varnamelist(3,5)="sigma_level"
+varnamelist(3,6)="olev"
 
 ncstatus = nf_inq_dimid(ncid,valname,valident)
 If (ncstatus==nf_noerr) Then
@@ -983,7 +984,7 @@ Character*80 inunit
 If (utype.NE.otype) Then
   Select Case(utype)
 
-    Case('Pa/s')
+    Case('Pa/s', 'Pa s-1')
       Call getncarray(ncid,'temp',arrsize,tempdata)
       Call getncdata(ncid,'temp','units',inunit)
       Call arrfieldrescale(inunit,'K',tempdata,arrsize(:,2))      
@@ -1019,7 +1020,7 @@ If (utype.NE.otype) Then
   
   Select Case(otype)
   
-    Case('m/s')
+    Case('m/s', 'm s-1')
       ! Do nothing
       
     Case DEFAULT
