@@ -50,9 +50,9 @@ clean:
 
 version.h: FORCE
 	rm -f brokenver tmpver
-	echo "      character(len=*), parameter :: version ='LL2HPAC r'" > brokenver
-	echo "      character(len=*), parameter :: version ='LL2HPAC r`svnversion .`'" > tmpver
-	grep exported tmpver || grep Unversioned tmpver || cmp tmpver brokenver || cmp tmpver version.h || mv tmpver version.h
+	echo "      character(len=*), parameter :: version ='LL2HPAC '" > brokenver
+	echo "      character(len=*), parameter :: version ='LL2HPAC `git log | head -3 | tail -1`'" > tmpver
+	cmp tmpver brokenver || cmp tmpver version.h || mv tmpver version.h
 FORCE:
 
 .f90.o:
