@@ -1,6 +1,21 @@
 Program ll2hpac
 
-! Revision date: 19/05/06
+! Copyright 2015-2023 Commonwealth Scientific Industrial Research Organisation (CSIRO)
+    
+! This file is part of the Conformal Cubic Atmospheric Model (CCAM)
+!
+! CCAM is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! CCAM is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with CCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! This code is for converting CCAM nc output (on lat/lon grid) into
@@ -24,9 +39,9 @@ write(6,*) version
 Write(6,*) 'Warning: this code has only been designed for SCIPUFF'
 
 ! Read switches
-nopts=3
+nopts=4
 Allocate (options(nopts,3))
-options(:,1) = (/ '-i', '-o', '-n' /)
+options(:,1) = (/ '-i', '-o', '-n', '-b' /)
 options(:,2) = ''
 
 Call readswitch(options,nopts)
@@ -72,6 +87,8 @@ Write(6,*) "  -i inputfile   Input filename"
 Write(6,*) "  -o outputfile  Output filename (default = inputfile.fmt)"
 Write(6,*) "  -n nestfile    MEDOC file to be nested in the current file"
 Write(6,*) "                 (default = no nested file)"
+write(6,*) "  -b method      File format where method=free, binary"
+write(6,*) "                 (default = free)"
 Write(6,*)
 call finishbanner
 Stop
@@ -90,12 +107,13 @@ Implicit None
 
 Integer nopts
 Character(len=*), dimension(nopts,2), intent(inout) :: options
-Integer infile,outfile,nestfile
+Integer infile,outfile,nestfile,fmethod
 Integer locate
 
 infile=locate('-i',options(:,1),nopts)
 outfile=locate('-o',options(:,1),nopts)
 nestfile=locate('-n',options(:,1),nopts)
+fmethod=locate('-b',options(:,1),nopts)
 
 If (options(infile,2).EQ.'') then
   Write(6,*) "ERROR: No input filename specified"
@@ -106,6 +124,11 @@ End if
 If (options(outfile,2).EQ.'') then
   ! Default output filename
     options(outfile,2)=trim(options(infile,2))//'.fmt'
+End if
+
+If (options(fmethod,2).EQ.'') then
+  ! Default output file format
+    options(fmethod,2)='free'
 End if
 
 Return
@@ -125,7 +148,7 @@ Implicit None
 Integer, intent(in) :: nopts
 Character(len=*), dimension(nopts,2), intent(in) :: options
 Character*80, dimension(:,:), allocatable :: varname3d,varname2d
-Character*1024 :: infile,outfile,nestfile,returnoption
+Character*1024 :: infile,outfile,nestfile,returnoption,fmethod
 Character*80 :: nctmunit,nctmdate,inunit
 Real, dimension(:,:,:,:), allocatable :: arrdata
 Real, dimension(:,:,:), allocatable :: inlvl
@@ -140,8 +163,6 @@ Integer, dimension(1:2,1:2) :: varnum
 Integer outunit,ncstatus,ncid,it,ii,ot
 Integer i,j,itmin
 Logical mode
-
-mode=.TRUE. ! T=Free, F=Binary HPAC format
 
 ! Define HPAC metadata
 varnum(1,2)=7 ! max 3d
@@ -183,6 +204,19 @@ varnum(:,1)=varnum(:,2) ! actual 3d and 2d
 infile=returnoption('-i',options,nopts)
 outfile=returnoption('-o',options,nopts)
 nestfile=returnoption('-n',options,nopts)
+fmethod=returnoption('-b',options,nopts)
+
+! Select file format
+select case(fmethod)
+  case('free')
+    mode=.TRUE. ! T=Free HPAC format
+  case('binary')
+    mode=.FALSE. ! F=Binary HPAC format  
+  case default
+    write(6,*) "ERROR: Unknown file format ",trim(fmethod)
+    call finishbanner
+    stop -1
+end select
 
 ! Open files
 outunit=1
