@@ -1,6 +1,6 @@
 ! Conformal Cubic Atmospheric Model
     
-! Copyright 2015 Commonwealth Scientific Industrial Research Organisation (CSIRO)
+! Copyright 2015-2025 Commonwealth Scientific Industrial Research Organisation (CSIRO)
     
 ! This file is part of the Conformal Cubic Atmospheric Model (CCAM)
 !
@@ -747,17 +747,19 @@ End
 ! the terrain height
 !
 
-Subroutine nccallvlheight(ncid,outlvl,lvlnum,otype)
+Subroutine nccallvlheight(ncid,outlvl,lvlnum,otype,it_start)
 
 Implicit None
 
 Integer, intent(in) :: ncid,lvlnum
+integer, intent(in) :: it_start
 Real, dimension(1:lvlnum), intent(out) :: outlvl
 Character(len=*), intent(in) :: otype
 Real, dimension(:,:,:), allocatable :: arrdata
 Real, dimension(1:lvlnum) :: tlvl
 Integer, dimension(1:4) :: ncdim
 Integer it,i,j,itop(1),ibot(1)
+integer ita
 Real x,holdlvl
 
 Call getncdims(ncid,ncdim)
@@ -770,11 +772,13 @@ End If
 ! Define height array
 Allocate(arrdata(1:ncdim(1),1:ncdim(2),1:ncdim(3)))
 
+ita = it_start
+
 ! Step through all time steps (skip first time step)
 outlvl=0.
-Do it=2,ncdim(4)
+Do it=ita,ncdim(4)
   Call ncgetlvlheight(ncid,it,arrdata,ncdim,otype)
-  If (it.EQ.2) Then
+  If (it.EQ.1) Then
     itop=Maxloc(arrdata(1,1,:))
     ibot=Minloc(arrdata(1,1,:))
     outlvl(ibot)=0.

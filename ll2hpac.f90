@@ -1,6 +1,6 @@
 Program ll2hpac
 
-! Copyright 2015-2023 Commonwealth Scientific Industrial Research Organisation (CSIRO)
+! Copyright 2015-2025 Commonwealth Scientific Industrial Research Organisation (CSIRO)
     
 ! This file is part of the Conformal Cubic Atmospheric Model (CCAM)
 !
@@ -245,7 +245,13 @@ tlist(2)=Int(maxtime)
 tlist(3)=Int(timestep)
 ! Read nc level data and convert to meters
 Allocate(outlvl(1:ncsize(3)))
-Call nccallvlheight(ncid,outlvl,ncsize(3),'meters')
+
+if (tlist(1).EQ.0) then
+  Call nccallvlheight(ncid,outlvl,ncsize(3),'meters',2)
+else
+  Call nccallvlheight(ncid,outlvl,ncsize(3),'meters',1)
+end if
+
 
 ! Display nc data
 Write(6,'(A20,I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2)') " NetCDF file date : ",datearray(:)
