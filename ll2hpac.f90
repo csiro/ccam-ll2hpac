@@ -148,12 +148,14 @@ Implicit None
 Integer, intent(in) :: nopts
 Character(len=*), dimension(nopts,2), intent(in) :: options
 Character*80, dimension(:,:), allocatable :: varname3d,varname2d
+character*80, dimension(2) :: ctmp
 Character*1024 :: infile,outfile,nestfile,returnoption,fmethod
 Character*80 :: nctmunit,nctmdate,inunit
 Real, dimension(:,:,:,:), allocatable :: arrdata
 Real, dimension(:,:,:), allocatable :: inlvl
 Real, dimension(:), allocatable :: outlvl
 Real, dimension(1:2,1:3) :: lonlat
+Real, dimension(3) :: tmp
 Real mintime,maxtime,timestep,x
 Integer, dimension(1:4,1:2) :: arrsize
 Integer, dimension(1:4) :: ncsize
@@ -255,8 +257,10 @@ end if
 
 ! Display nc data
 Write(6,'(A20,I4.4,"-",I2.2,"-",I2.2," ",I2.2,":",I2.2,":",I2.2)') " NetCDF file date : ",datearray(:)
-Write(6,*) "lon [start,end,count] =",lonlat(1,:)
-Write(6,*) "lat [start,end,count] =",lonlat(2,:)
+tmp(:) = lonlat(1,:)
+Write(6,*) "lon [start,end,count] =",tmp(:)
+tmp(:) = lonlat(2,:)
+Write(6,*) "lat [start,end,count] =",tmp(:)
 Write(6,*) "Time [start,end,step] =",tlist(:)
 Write(6,*) "Rescaled levels (m) =",outlvl
 
@@ -304,7 +308,8 @@ Do it=itmin,ncsize(4)
   
   Do ii=1,varnum(1,1)
     ! Get data from nc file
-    Call getmeta(ncid,varname3d(ii,:),arrdata(:,:,:,1),arrsize)
+    ctmp(1:2) = varname3d(ii,1:2)  
+    Call getmeta(ncid,ctmp(1:2),arrdata(:,:,:,1),arrsize)
     Call convertlvl(arrdata(:,:,:,1),inlvl,outlvl,arrsize(1:3,2))
 
     ! Write MEDOC (HPAC) data
@@ -314,7 +319,8 @@ Do it=itmin,ncsize(4)
   arrsize(3,2)=1
   Do ii=1,varnum(2,1)
     ! Get data from nc file
-    Call getmeta(ncid,varname2d(ii,:),arrdata(:,:,1,1),arrsize)
+    ctmp(1:2) = varname2d(ii,1:2)  
+    Call getmeta(ncid,ctmp(1:2),arrdata(:,:,1,1),arrsize)
     Select case(varname2d(ii,1))
       Case ('BOWEN')
         ! Fix for negative Bowen ratio
