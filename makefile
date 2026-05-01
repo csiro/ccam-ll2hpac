@@ -13,7 +13,7 @@ endif
 
 ifeq ($(GFORTRAN),yes)
 FC = gfortran
-XFLAGS = -O2 -mtune=native -march=native -I $(NETCDF_ROOT)/include
+XFLAGS = -O2 -fallow-argument-mismatch -mtune=native -march=native -I $(NETCDF_ROOT)/include
 PPFLAG90 = -x f95-cpp-input
 PPFLAG77 = -x f77-cpp-input
 DEBUGFLAG = -g -Wall -Wextra -fbounds-check -fbacktrace
